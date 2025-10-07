@@ -46,7 +46,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-github}
       DATABASE_NAME: ${DATABASE_NAME:-github_search}
       DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-true}
-      DATABASE_SSL: ${DATABASE_SSL:-false}
+      DATABASE_SSL: ${DATABASE_SSL:-}
       JWT_SECRET: ${JWT_SECRET:-changeme}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
       GITHUB_API_URL: https://api.github.com
@@ -93,7 +93,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-github}
       DATABASE_NAME: ${DATABASE_NAME:-github_search}
       DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-true}
-      DATABASE_SSL: ${DATABASE_SSL:-false}
+      DATABASE_SSL: ${DATABASE_SSL:-}
       JWT_SECRET: ${JWT_SECRET:-changeme}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
       GITHUB_API_URL: https://api.github.com
@@ -140,7 +140,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-github}
       DATABASE_NAME: ${DATABASE_NAME:-github_search}
       DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-true}
-      DATABASE_SSL: ${DATABASE_SSL:-false}
+      DATABASE_SSL: ${DATABASE_SSL:-}
       JWT_SECRET: ${JWT_SECRET:-changeme}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
       GITHUB_API_URL: https://api.github.com
