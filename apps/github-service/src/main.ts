@@ -1,13 +1,27 @@
 import { NestFactory } from '@nestjs/core';
 import { GithubServiceModule } from './github-service.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ConfigService } from '@nestjs/config';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.create(GithubServiceModule);
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    GithubServiceModule,
+    {
+      transport: Transport.TCP,
+      options: {
+        host: process.env.GITHUB_SERVICE_HOST || '0.0.0.0',
+        port: parseInt(process.env.GITHUB_SERVICE_PORT || '3002', 10),
+      },
+    },
+  );
+
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('GITHUB_SERVICE_PORT') ?? 3000;
-  await app.listen(port);
+
+  await app.listen();
+
+  console.log(
+    `Github Service is listening on ${process.env.GITHUB_SERVICE_HOST || '0.0.0.0'}:${process.env.GITHUB_SERVICE_PORT || '3002'}`,
+  );
 }
+
 bootstrap();
