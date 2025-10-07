@@ -1,0 +1,131 @@
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+    container_name: github-search-auth-service
+    restart: unless-stopped
+    environment:
+      SERVICE_NAME: auth-service
+      NODE_ENV: production
+      API_GATEWAY_PORT: 3000
+      AUTH_SERVICE_HOST: 0.0.0.0
+      AUTH_SERVICE_PORT: 3001
+      GITHUB_SERVICE_HOST: github-service
+      GITHUB_SERVICE_PORT: 3002
+      DATABASE_TYPE: postgres
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-false}
+      DATABASE_SSL: ${DATABASE_SSL:-true}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
+      GITHUB_API_URL: https://api.github.com
+      GITHUB_API_TOKEN: ${GITHUB_API_TOKEN:-}
+    ports:
+      - '3001:3001'
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('net').createConnection({host:'localhost',port:3001}).on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  github-service:
+    build:
+      context: .
+      dockerfile: apps/github-service/Dockerfile
+    container_name: github-search-github-service
+    restart: unless-stopped
+    environment:
+      SERVICE_NAME: github-service
+      NODE_ENV: production
+      API_GATEWAY_PORT: 3000
+      AUTH_SERVICE_HOST: auth-service
+      AUTH_SERVICE_PORT: 3001
+      GITHUB_SERVICE_HOST: 0.0.0.0
+      GITHUB_SERVICE_PORT: 3002
+      DATABASE_TYPE: postgres
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-false}
+      DATABASE_SSL: ${DATABASE_SSL:-true}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
+      GITHUB_API_URL: https://api.github.com
+      GITHUB_API_TOKEN: ${GITHUB_API_TOKEN:-}
+    ports:
+      - '3002:3002'
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('net').createConnection({host:'localhost',port:3002}).on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+    container_name: github-search-api-gateway
+    restart: unless-stopped
+    environment:
+      SERVICE_NAME: api-gateway
+      NODE_ENV: production
+      API_GATEWAY_PORT: 3000
+      AUTH_SERVICE_HOST: auth-service
+      AUTH_SERVICE_PORT: 3001
+      GITHUB_SERVICE_HOST: github-service
+      GITHUB_SERVICE_PORT: 3002
+      DATABASE_TYPE: postgres
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-false}
+      DATABASE_SSL: ${DATABASE_SSL:-true}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
+      GITHUB_API_URL: https://api.github.com
+      GITHUB_API_TOKEN: ${GITHUB_API_TOKEN:-}
+    ports:
+      - '3000:3000'
+    networks:
+      - app-network
+    depends_on:
+      - auth-service
+      - github-service
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'wget --no-verbose --tries=1 --spider http://localhost:3000/api || exit 1',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  app-network:
+    driver: bridge
