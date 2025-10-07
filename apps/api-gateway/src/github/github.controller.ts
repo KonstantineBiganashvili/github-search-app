@@ -1,13 +1,16 @@
-import { Controller, Get, Query, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { Controller, Get, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { GithubService } from './github.service';
 import {
   SearchRepositoriesDto,
   SortOrder,
 } from './dto/search-repositories.dto';
 import { RepositoryDto } from './dto/repository.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('github')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard) 
 @Controller('github')
 export class GithubController {
   constructor(private readonly githubService: GithubService) {}
