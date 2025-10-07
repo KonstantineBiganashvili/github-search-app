@@ -58,6 +58,10 @@ export class EnvironmentVariables {
   @IsBoolean()
   DATABASE_SYNCHRONIZE!: boolean;
 
+  @Type(() => Boolean)
+  @IsBoolean()
+  DATABASE_SSL!: boolean;
+
   @IsString()
   JWT_SECRET!: string;
 

@@ -3,9 +3,10 @@ import { AuthServiceController } from './auth-service.controller';
 import { AuthServiceService } from './auth-service.service';
 import { LoggerModule } from '@app/logger';
 import { AppConfigModule } from '@app/config';
+import { DatabaseModule } from '../database/database.module';
 
 @Module({
-  imports: [LoggerModule, AppConfigModule],
+  imports: [LoggerModule, AppConfigModule, DatabaseModule],
   controllers: [AuthServiceController],
   providers: [AuthServiceService],
 })
