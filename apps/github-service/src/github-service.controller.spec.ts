@@ -11,7 +11,9 @@ describe('GithubServiceController', () => {
       providers: [GithubServiceService],
     }).compile();
 
-    githubServiceController = app.get<GithubServiceController>(GithubServiceController);
+    githubServiceController = app.get<GithubServiceController>(
+      GithubServiceController,
+    );
   });
 
   describe('root', () => {

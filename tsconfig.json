@@ -22,12 +22,8 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/logger": [
-        "libs/logger/src"
-      ],
-      "@app/logger/*": [
-        "libs/logger/src/*"
-      ]
+      "@app/logger": ["libs/logger/src"],
+      "@app/logger/*": ["libs/logger/src/*"]
     }
   }
 }
