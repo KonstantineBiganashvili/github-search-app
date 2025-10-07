@@ -21,28 +21,137 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## GitHub Search App
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Microservices-based NestJS application that lets users sign up/sign in and search GitHub repositories via a secure API Gateway.
 
-## Project setup
+### Quick start (zero config)
+
+Run everything with a single command using the provided test compose file. No changes or local env files are required.
+
+```bash
+docker compose -f docker-compose-test.yml up --build -d
+```
+
+What you get out of the box:
+
+- API Gateway: http://localhost:3000 (Swagger at `/api`)
+- Auth Service (TCP): 3001; GitHub Service (TCP): 3002
+- Postgres: 5432 with seeded defaults from `docker-compose-test.yml`
+- Uses `.env.docker.example` automatically for service envs (e.g. `JWT_SECRET=changeme`)
+
+Stop all:
+
+```bash
+docker compose -f docker-compose-test.yml down -v
+```
+
+### Architecture
+
+- **API Gateway (`apps/api-gateway`)**: HTTP entrypoint. Exposes REST endpoints, validates input, enforces JWT auth, hosts Swagger docs at `/api`.
+- **Auth Service (`apps/auth-app`)**: TCP microservice handling user creation, credential verification, and JWT issuance/validation.
+- **GitHub Service (`apps/github-app`)**: TCP microservice that calls the GitHub REST API, applies optional sorting and filtering, and returns normalized results.
+- **Shared libs (`libs/*`)**: Configuration and structured logging via Winston.
+
+### Tech stack
+
+- NestJS 11, TypeScript 5
+- Microservices over TCP
+- JWT auth (`@nestjs/jwt`, `passport-jwt`)
+- Axios for outbound HTTP
+- Winston with daily rotate logs
+
+---
+
+## Getting started
 
 ```bash
 $ npm install
 ```
 
-## Compile and run the project
+### Environment variables
+
+The system reads configuration from process env. For Docker, variables are provided via `.env.docker` referenced in `docker-compose.yml`.
+
+Required/important variables:
+
+- `API_GATEWAY_PORT` (default: `3000`)
+- `AUTH_SERVICE_HOST` (default: `0.0.0.0` in service containers)
+- `AUTH_SERVICE_PORT` (default: `3001`)
+- `GITHUB_SERVICE_HOST` (default: `0.0.0.0` in service containers)
+- `GITHUB_SERVICE_PORT` (default: `3002`)
+- `JWT_SECRET` (required)
+- `JWT_EXPIRATION` (default: `1h`)
+- `GITHUB_API_URL` (default: `https://api.github.com`)
+- `GITHUB_API_TOKEN` (optional, increases GitHub rate limits)
+
+If you plan to enable persistent users storage later, Postgres envs are already wired in `docker-compose.yml` (`DATABASE_*`), but the current sample users repo is in-memory in the Auth service code.
+
+---
+
+## Run with Docker (recommended)
+
+1. Create a `.env.docker` at the project root (example):
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+JWT_SECRET=your-local-secret
+JWT_EXPIRATION=1h
+GITHUB_API_TOKEN=
+# Optional database envs if you wire a DB
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=github_search
+DATABASE_SYNCHRONIZE=false
+DATABASE_SSL=false
 ```
+
+2. Start all services:
+
+```bash
+docker compose up --build -d
+```
+
+Services and ports:
+
+- API Gateway: http://localhost:3000
+- Auth Service (TCP): 3001
+- GitHub Service (TCP): 3002
+
+Swagger UI: http://localhost:3000/api
+
+Stop:
+
+```bash
+docker compose down
+```
+
+---
+
+## Run locally without Docker
+
+In separate terminals:
+
+1. Auth Service (TCP microservice on 3001)
+
+```bash
+npx nest start apps/auth-app -w
+```
+
+2. GitHub Service (TCP microservice on 3002)
+
+```bash
+npx nest start apps/github-app -w
+```
+
+3. API Gateway (HTTP on 3000)
+
+```bash
+npx nest start apps/api-gateway -w
+```
+
+Ensure you export at least `JWT_SECRET` in your shell for all three processes, or create a `.env` loader of your choice.
 
 ## Run tests
 
@@ -57,42 +166,146 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Deployment
+## API
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Base URL (gateway): `http://localhost:3000`
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Swagger docs: `GET /api`
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### Auth
+
+#### POST /auth/signup
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "StrongPass123!"
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Response (201):
 
-## Resources
+```json
+{
+  "user": { "id": "u1", "email": "user@example.com" },
+  "accessToken": "<jwt>"
+}
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+#### POST /auth/signin
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "StrongPass123!"
+}
+```
+
+Response (200): same shape as signup.
+
+### GitHub
+
+Secured with Bearer JWT.
+
+#### GET /github/search
+
+Query params:
+
+- `query` (string, required): search term forwarded to GitHub Search API.
+- `sort` (enum: `asc` | `desc`, optional): client-side sort by repository name.
+- `ignore` (string, optional): filters out repos whose names contain this substring (case-insensitive).
+
+Example:
+
+```http
+GET /github/search?query=nestjs&sort=asc&ignore=demo HTTP/1.1
+Host: localhost:3000
+Authorization: Bearer <jwt>
+```
+
+Response (200):
+
+```json
+[
+  {
+    "id": 123,
+    "name": "nest",
+    "fullName": "nestjs/nest",
+    "description": "...",
+    "htmlUrl": "https://github.com/nestjs/nest",
+    "stars": 65000,
+    "language": "TypeScript",
+    "owner": {
+      "login": "nestjs",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/28507035?v=4"
+    }
+  }
+]
+```
+
+Error cases:
+
+- 400: Upstream GitHub error or invalid query.
+- 401: Missing/invalid JWT.
+
+---
+
+## Development
+
+### Scripts
+
+```bash
+# build all apps
+npm run build
+
+# lint
+npm run lint
+
+# e2e tests
+npm run test:e2e
+
+# e2e per service
+npm run test:e2e:api-gateway
+npm run test:e2e:auth-app
+npm run test:e2e:github-app
+```
+
+### Logging
+
+Winston logger is configured with console output and daily rotating file logs under `logs/app-YYYY-MM-DD.log`. Adjust `LOG_LEVEL`/`FILE_LOG_LEVEL` via env.
+
+### Project layout
+
+```
+apps/
+  api-gateway/      # REST gateway + Swagger
+  auth-app/         # Auth microservice (TCP)
+  github-app/       # GitHub microservice (TCP)
+libs/
+  config/           # Config module (placeholder for future expansion)
+  logger/           # Winston logger module
+```
+
+---
+
+## Security
+
+- All GitHub search endpoints require a valid JWT (Bearer token).
+- JWT secret and expiration are configurable via env.
+
+## Notes
+
+- The GitHub service optionally uses `GITHUB_API_TOKEN` for higher rate limits.
+- The Auth service currently demonstrates the flow with hashing and JWT. Wire a real database by implementing the `users` repository with TypeORM and enabling the provided Postgres envs.
 
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This repository is provided as part of a coding exercise. No license granted.
