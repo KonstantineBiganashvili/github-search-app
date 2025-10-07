@@ -5,23 +5,13 @@ import { LoggerModule } from '@app/logger';
 import { AppConfigModule } from '@app/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     LoggerModule,
     AppConfigModule,
     ClientsModule.registerAsync([
-      {
-        name: 'AUTH_SERVICE',
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            host: configService.get<string>('AUTH_SERVICE_HOST'),
-            port: configService.get<number>('AUTH_SERVICE_PORT'),
-          },
-        }),
-        inject: [ConfigService],
-      },
       {
         name: 'GITHUB_SERVICE',
         useFactory: (configService: ConfigService) => ({
@@ -34,6 +24,7 @@ import { ConfigService } from '@nestjs/config';
         inject: [ConfigService],
       },
     ]),
+    AuthModule,
   ],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],

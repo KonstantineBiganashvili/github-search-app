@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from './config.service';
+import { AppConfigService } from './config.service';
 import { validate } from './env-validation.function';
 import { ConfigModule } from '@nestjs/config';
 
@@ -11,7 +11,7 @@ import { ConfigModule } from '@nestjs/config';
       validate,
     }),
   ],
-  providers: [ConfigService],
-  exports: [ConfigService],
+  providers: [AppConfigService],
+  exports: [AppConfigService],
 })
 export class AppConfigModule {}

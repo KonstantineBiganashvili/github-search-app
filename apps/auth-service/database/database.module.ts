@@ -17,7 +17,6 @@ import { ConfigService } from '@nestjs/config';
         ssl: configService.get<boolean>('DATABASE_SSL')
           ? { rejectUnauthorized: false }
           : false,
-        entities: ['../**/*.entity.ts'],
         autoLoadEntities: true,
       }),
     }),
