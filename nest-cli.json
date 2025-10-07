@@ -18,13 +18,13 @@
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
       }
     },
-    "auth-app": {
+    "auth-api": {
       "type": "application",
-      "root": "apps/auth-app",
+      "root": "apps/auth-api",
       "entryFile": "main",
-      "sourceRoot": "apps/auth-app/src",
+      "sourceRoot": "apps/auth-api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/auth-app/tsconfig.app.json"
+        "tsConfigPath": "apps/auth-api/tsconfig.app.json"
       }
     },
     "config": {
@@ -36,13 +36,13 @@
         "tsConfigPath": "libs/config/tsconfig.lib.json"
       }
     },
-    "github-app": {
+    "github-api": {
       "type": "application",
-      "root": "apps/github-app",
+      "root": "apps/github-api",
       "entryFile": "main",
-      "sourceRoot": "apps/github-app/src",
+      "sourceRoot": "apps/github-api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/github-app/tsconfig.app.json"
+        "tsConfigPath": "apps/github-api/tsconfig.app.json"
       }
     },
     "logger": {

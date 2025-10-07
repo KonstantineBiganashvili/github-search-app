@@ -1,19 +1,19 @@
 services:
-  auth-app:
+  auth-api:
     build:
       context: .
-      dockerfile: apps/auth-app/Dockerfile
-    container_name: github-search-auth-app
+      dockerfile: apps/auth-api/Dockerfile
+    container_name: github-search-auth-api
     restart: unless-stopped
     env_file:
       - .env.docker
     environment:
-      SERVICE_NAME: auth-app
+      SERVICE_NAME: auth-api
       NODE_ENV: production
       API_GATEWAY_PORT: 3000
       AUTH_SERVICE_HOST: 0.0.0.0
       AUTH_SERVICE_PORT: 3001
-      GITHUB_SERVICE_HOST: github-app
+      GITHUB_SERVICE_HOST: github-api
       GITHUB_SERVICE_PORT: 3002
       DATABASE_TYPE: postgres
       DATABASE_HOST: ${DATABASE_HOST}
@@ -43,19 +43,19 @@ services:
       timeout: 10s
       retries: 3
 
-  github-app:
+  github-api:
     build:
       context: .
-      dockerfile: apps/github-app/Dockerfile
-    container_name: github-search-github-app
+      dockerfile: apps/github-api/Dockerfile
+    container_name: github-search-github-api
     restart: unless-stopped
     env_file:
       - .env.docker
     environment:
-      SERVICE_NAME: github-app
+      SERVICE_NAME: github-api
       NODE_ENV: production
       API_GATEWAY_PORT: 3000
-      AUTH_SERVICE_HOST: auth-app
+      AUTH_SERVICE_HOST: auth-api
       AUTH_SERVICE_PORT: 3001
       GITHUB_SERVICE_HOST: 0.0.0.0
       GITHUB_SERVICE_PORT: 3002
@@ -99,9 +99,9 @@ services:
       SERVICE_NAME: api-gateway
       NODE_ENV: production
       API_GATEWAY_PORT: 3000
-      AUTH_SERVICE_HOST: auth-app
+      AUTH_SERVICE_HOST: auth-api
       AUTH_SERVICE_PORT: 3001
-      GITHUB_SERVICE_HOST: github-app
+      GITHUB_SERVICE_HOST: github-api
       GITHUB_SERVICE_PORT: 3002
       DATABASE_TYPE: postgres
       DATABASE_HOST: ${DATABASE_HOST}
@@ -120,13 +120,13 @@ services:
     networks:
       - app-network
     depends_on:
-      - auth-app
-      - github-app
+      - auth-api
+      - github-api
     healthcheck:
       test:
         [
           'CMD-SHELL',
-          'wget --no-verbose --tries=1 --spider http://localhost:3000/api || exit 1',
+          'wget --no-verbose --tries=1 --spider http://localhost:3000/api/docs || exit 1',
         ]
       interval: 30s
       timeout: 10s

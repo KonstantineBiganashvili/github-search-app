@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { GithubServiceModule } from '../src/github-app.module';
+import { GithubApiModule } from '../src/github-api.module';
 import { GithubService } from '../src/github/github.service';
 import { HttpService } from '@nestjs/axios';
 import { of, throwError } from 'rxjs';
@@ -46,7 +46,7 @@ describe('GitHub Service (e2e)', () => {
     } as AxiosResponse;
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [GithubServiceModule],
+      imports: [GithubApiModule],
     })
       .overrideProvider(HttpService)
       .useValue({ get: jest.fn(() => of(mockResponse)) })
@@ -71,7 +71,7 @@ describe('GitHub Service (e2e)', () => {
     } as AxiosError;
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [GithubServiceModule],
+      imports: [GithubApiModule],
     })
       .overrideProvider(HttpService)
       .useValue({ get: jest.fn(() => throwError(() => axiosError)) })

@@ -9,9 +9,9 @@ COPY nest-cli.json ./
 RUN npm ci
 
 COPY libs ./libs
-COPY apps/auth-app ./apps/auth-app
+COPY apps/auth-api ./apps/auth-api
 
-RUN npm run build auth-app
+RUN npm run build auth-api
 
 FROM node:22-alpine AS production
 
@@ -26,4 +26,4 @@ COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3001
 
-CMD ["node", "dist/apps/auth-app/main.js"]
+CMD ["node", "dist/apps/auth-api/main.js"]

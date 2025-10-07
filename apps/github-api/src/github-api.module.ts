@@ -8,4 +8,4 @@ import { GithubModule } from './github/github.module';
   controllers: [],
   providers: [],
 })
-export class GithubServiceModule {}
+export class GithubApiModule {}

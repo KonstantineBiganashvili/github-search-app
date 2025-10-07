@@ -18,9 +18,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e:api-gateway": "jest --runInBand --config ./apps/api-gateway/test/jest-e2e.json",
-    "test:e2e:auth-app": "jest --runInBand --config ./apps/auth-app/test/jest-e2e.json",
-    "test:e2e:github-app": "jest --runInBand --config ./apps/github-app/test/jest-e2e.json",
-    "test:e2e": "npm run test:e2e:api-gateway && npm run test:e2e:auth-app && npm run test:e2e:github-app"
+    "test:e2e:auth-api": "jest --runInBand --config ./apps/auth-api/test/jest-e2e.json",
+    "test:e2e:github-api": "jest --runInBand --config ./apps/github-api/test/jest-e2e.json",
+    "test:e2e": "npm run test:e2e:api-gateway && npm run test:e2e:auth-api && npm run test:e2e:github-api"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",

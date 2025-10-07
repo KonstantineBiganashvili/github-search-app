@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { GithubServiceModule } from './github-app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { GithubApiModule } from './github-api.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    GithubServiceModule,
+    GithubApiModule,
     {
       transport: Transport.TCP,
       options: {

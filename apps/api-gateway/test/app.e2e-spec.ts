@@ -2,12 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { ApiGatewayModule } from './../src/api-gateway.module';
-import { GithubServiceModule } from '../../github-app/src/github-app.module';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { of } from 'rxjs';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
+import { GithubApiModule } from '../../github-api/src/github-api.module';
 
 describe('API Gateway (integration e2e)', () => {
   let app: INestApplication;
@@ -21,7 +21,7 @@ describe('API Gateway (integration e2e)', () => {
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
 
     const githubModuleFixture: TestingModule = await Test.createTestingModule({
-      imports: [GithubServiceModule],
+      imports: [GithubApiModule],
     })
       .overrideProvider(HttpService)
       .useValue({

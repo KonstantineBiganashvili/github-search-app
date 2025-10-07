@@ -1,12 +1,8 @@
-import {
-  Injectable,
-  ConflictException,
-  UnauthorizedException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
+import { RpcException } from '@nestjs/microservices';
 
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -24,7 +20,10 @@ export class AuthService {
 
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      throw new RpcException({
+        status: 409,
+        message: 'User with this email already exists',
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -50,12 +49,12 @@ export class AuthService {
 
     const user = await this.usersService.findByEmailWithPassword(email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new RpcException({ status: 401, message: 'Invalid credentials' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new RpcException({ status: 401, message: 'Invalid credentials' });
     }
 
     const accessToken = this.jwtService.sign({
@@ -80,7 +79,7 @@ export class AuthService {
 
       const user = await this.usersService.findById(payload.sub);
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new RpcException({ status: 404, message: 'User not found' });
       }
 
       return {
@@ -88,7 +87,7 @@ export class AuthService {
         email: user.email,
       };
     } catch {
-      throw new UnauthorizedException('Invalid token');
+      throw new RpcException({ status: 401, message: 'Invalid token' });
     }
   }
 }

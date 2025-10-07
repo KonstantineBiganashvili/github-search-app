@@ -9,9 +9,9 @@ COPY nest-cli.json ./
 RUN npm ci
 
 COPY libs ./libs
-COPY apps/github-app ./apps/github-app
+COPY apps/github-api ./apps/github-api
 
-RUN npm run build github-app
+RUN npm run build github-api
 
 FROM node:22-alpine AS production
 
@@ -26,4 +26,4 @@ COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3002
 
-CMD ["node", "dist/apps/github-app/main.js"]
+CMD ["node", "dist/apps/github-api/main.js"]

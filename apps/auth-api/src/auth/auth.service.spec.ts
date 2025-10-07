@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
@@ -93,12 +93,10 @@ describe('AuthService', () => {
       });
     });
 
-    it('should throw ConflictException if user already exists', async () => {
+    it('should throw RpcException(409) if user already exists', async () => {
       mockUsersService.findByEmail.mockResolvedValue({ id: '123' });
 
-      await expect(service.signup(signupDto)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(service.signup(signupDto)).rejects.toThrow(RpcException);
       expect(mockUsersService.findByEmail).toHaveBeenCalledWith(
         signupDto.email,
       );
@@ -147,15 +145,13 @@ describe('AuthService', () => {
       });
     });
 
-    it('should throw UnauthorizedException if user not found', async () => {
+    it('should throw RpcException(401) if user not found', async () => {
       mockUsersService.findByEmailWithPassword.mockResolvedValue(null);
 
-      await expect(service.signin(signinDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.signin(signinDto)).rejects.toThrow(RpcException);
     });
 
-    it('should throw UnauthorizedException if password is invalid', async () => {
+    it('should throw RpcException(401) if password is invalid', async () => {
       const mockUser = {
         id: '123',
         email: signinDto.email,
@@ -165,9 +161,7 @@ describe('AuthService', () => {
       mockUsersService.findByEmailWithPassword.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.signin(signinDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.signin(signinDto)).rejects.toThrow(RpcException);
     });
   });
 
@@ -195,17 +189,17 @@ describe('AuthService', () => {
       });
     });
 
-    it('should throw UnauthorizedException if token is invalid', async () => {
+    it('should throw RpcException(401) if token is invalid', async () => {
       mockJwtService.verify.mockImplementation(() => {
         throw new Error('Invalid token');
       });
 
       await expect(service.validateToken('invalid-token')).rejects.toThrow(
-        UnauthorizedException,
+        RpcException,
       );
     });
 
-    it('should throw NotFoundException if user not found', async () => {
+    it('should throw RpcException(404) if user not found', async () => {
       const payload = { sub: '123', email: 'test@example.com' };
       mockJwtService.verify.mockReturnValue(payload);
       mockUsersService.findById.mockResolvedValue(null);

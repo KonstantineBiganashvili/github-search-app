@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AuthServiceModule } from './auth-app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { AuthApiModule } from './auth-api.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AuthServiceModule,
+    AuthApiModule,
     {
       transport: Transport.TCP,
       options: {

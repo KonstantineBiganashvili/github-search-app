@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 import { firstValueFrom } from 'rxjs';
@@ -13,16 +13,53 @@ export class AuthService {
   ) {}
 
   async signup(signupDto: SignUpDto): Promise<AuthResponseDto> {
-    return firstValueFrom(this.authClient.send({ cmd: 'signup' }, signupDto));
+    try {
+      return await firstValueFrom(
+        this.authClient.send({ cmd: 'signup' }, signupDto),
+      );
+    } catch (err: unknown) {
+      const { status, message } =
+        typeof err === 'object' && err !== null
+          ? (err as { status?: number; message?: string })
+          : {};
+      throw new HttpException(
+        message || 'Internal server error',
+        typeof status === 'number' ? status : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async signin(signinDto: SignInDto): Promise<AuthResponseDto> {
-    return firstValueFrom(this.authClient.send({ cmd: 'signin' }, signinDto));
+    try {
+      return await firstValueFrom(
+        this.authClient.send({ cmd: 'signin' }, signinDto),
+      );
+    } catch (err: unknown) {
+      const { status, message } =
+        typeof err === 'object' && err !== null
+          ? (err as { status?: number; message?: string })
+          : {};
+      throw new HttpException(
+        message || 'Internal server error',
+        typeof status === 'number' ? status : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async validateToken(token: string): Promise<{ id: string; email: string }> {
-    return firstValueFrom(
-      this.authClient.send({ cmd: 'validate-token' }, { token }),
-    );
+    try {
+      return await firstValueFrom(
+        this.authClient.send({ cmd: 'validate-token' }, { token }),
+      );
+    } catch (err: unknown) {
+      const { status, message } =
+        typeof err === 'object' && err !== null
+          ? (err as { status?: number; message?: string })
+          : {};
+      throw new HttpException(
+        message || 'Internal server error',
+        typeof status === 'number' ? status : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
