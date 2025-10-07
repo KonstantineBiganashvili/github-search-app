@@ -1,4 +1,28 @@
 services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: github-search-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-github_search}
+      POSTGRES_USER: ${DATABASE_USERNAME:-github}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-github}
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DATABASE_USERNAME:-github} -d ${DATABASE_NAME:-github_search}',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   auth-app:
     build:
       context: .
@@ -6,24 +30,24 @@ services:
     container_name: github-search-auth-app
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env.docker.example
     environment:
       SERVICE_NAME: auth-app
-      NODE_ENV: production
+      NODE_ENV: test
       API_GATEWAY_PORT: 3000
       AUTH_SERVICE_HOST: 0.0.0.0
       AUTH_SERVICE_PORT: 3001
       GITHUB_SERVICE_HOST: github-app
       GITHUB_SERVICE_PORT: 3002
       DATABASE_TYPE: postgres
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-false}
-      DATABASE_SSL: ${DATABASE_SSL:-true}
-      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-github}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-github}
+      DATABASE_NAME: ${DATABASE_NAME:-github_search}
+      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-true}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      JWT_SECRET: ${JWT_SECRET:-changeme}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
       GITHUB_API_URL: https://api.github.com
       GITHUB_API_TOKEN: ${GITHUB_API_TOKEN:-}
@@ -31,6 +55,9 @@ services:
       - '3001:3001'
     networks:
       - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -50,24 +77,24 @@ services:
     container_name: github-search-github-app
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env.docker.example
     environment:
       SERVICE_NAME: github-app
-      NODE_ENV: production
+      NODE_ENV: test
       API_GATEWAY_PORT: 3000
       AUTH_SERVICE_HOST: auth-app
       AUTH_SERVICE_PORT: 3001
       GITHUB_SERVICE_HOST: 0.0.0.0
       GITHUB_SERVICE_PORT: 3002
       DATABASE_TYPE: postgres
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-false}
-      DATABASE_SSL: ${DATABASE_SSL:-true}
-      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-github}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-github}
+      DATABASE_NAME: ${DATABASE_NAME:-github_search}
+      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-true}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      JWT_SECRET: ${JWT_SECRET:-changeme}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
       GITHUB_API_URL: https://api.github.com
       GITHUB_API_TOKEN: ${GITHUB_API_TOKEN:-}
@@ -75,6 +102,9 @@ services:
       - '3002:3002'
     networks:
       - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -94,24 +124,24 @@ services:
     container_name: github-search-api-gateway
     restart: unless-stopped
     env_file:
-      - .env.docker
+      - .env.docker.example
     environment:
       SERVICE_NAME: api-gateway
-      NODE_ENV: production
+      NODE_ENV: test
       API_GATEWAY_PORT: 3000
       AUTH_SERVICE_HOST: auth-app
       AUTH_SERVICE_PORT: 3001
       GITHUB_SERVICE_HOST: github-app
       GITHUB_SERVICE_PORT: 3002
       DATABASE_TYPE: postgres
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-false}
-      DATABASE_SSL: ${DATABASE_SSL:-true}
-      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-github}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-github}
+      DATABASE_NAME: ${DATABASE_NAME:-github_search}
+      DATABASE_SYNCHRONIZE: ${DATABASE_SYNCHRONIZE:-true}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      JWT_SECRET: ${JWT_SECRET:-changeme}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-1h}
       GITHUB_API_URL: https://api.github.com
       GITHUB_API_TOKEN: ${GITHUB_API_TOKEN:-}
@@ -120,8 +150,12 @@ services:
     networks:
       - app-network
     depends_on:
-      - auth-app
-      - github-app
+      postgres:
+        condition: service_healthy
+      auth-app:
+        condition: service_started
+      github-app:
+        condition: service_started
     healthcheck:
       test:
         [
@@ -135,3 +169,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  pgdata:

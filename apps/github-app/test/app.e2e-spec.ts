@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { GithubServiceModule } from './../src/github-service.module';
-import { GithubService } from './../src/github/github.service';
+import { GithubServiceModule } from '../src/github-app.module';
+import { GithubService } from '../src/github/github.service';
 import { HttpService } from '@nestjs/axios';
 import { of, throwError } from 'rxjs';
 import { AxiosError, AxiosResponse } from 'axios';

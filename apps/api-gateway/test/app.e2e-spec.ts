@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { ApiGatewayModule } from './../src/api-gateway.module';
-import { GithubServiceModule } from './../../github-service/src/github-service.module';
+import { GithubServiceModule } from '../../github-app/src/github-app.module';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { of } from 'rxjs';

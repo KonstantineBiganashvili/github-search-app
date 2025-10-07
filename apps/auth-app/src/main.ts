@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AuthServiceModule } from './auth-service.module';
+import { AuthServiceModule } from './auth-app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 

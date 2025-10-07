@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { GithubServiceModule } from './github-service.module';
+import { GithubServiceModule } from './github-app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 

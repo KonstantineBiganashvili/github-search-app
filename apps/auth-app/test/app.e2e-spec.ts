@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthService } from './../src/auth/auth.service';
-import { AuthController } from './../src/auth/auth.controller';
-import { UsersService } from './../src/users/users.service';
+import { AuthService } from '../src/auth/auth.service';
+import { AuthController } from '../src/auth/auth.controller';
+import { UsersService } from '../src/users/users.service';
 import { ConfigModule } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
