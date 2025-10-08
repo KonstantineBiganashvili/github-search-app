@@ -1,6 +1,6 @@
 ## GitHub Search App
 
-Microservices-based NestJS application with an API Gateway, Auth service, and GitHub service. All HTTP routes are prefixed with `/api`, Swagger is at `/api/docs`.
+Microservices-based NestJS application with an API Gateway, Auth service, and GitHub service. All HTTP routes are prefixed with `/api`, Swagger is at `/api/swagger`.
 
 ### Prerequisites
 
@@ -17,7 +17,7 @@ docker compose -f docker-compose-test.yml up --build -d
 
 Services:
 
-- API Gateway: http://localhost:3000 (Swagger: http://localhost:3000/api/docs)
+- API Gateway: http://localhost:3000 (Swagger: http://localhost:3000/api/swagger)
 - Auth Service (TCP): 3001
 - GitHub Service (TCP): 3002
 - Postgres: 5432 (internal to the compose network)
@@ -45,7 +45,7 @@ npm run start:dev githbu-api
 
 Base URL: http://localhost:3000/api
 
-Swagger: http://localhost:3000/api/docs
+Swagger: http://localhost:3000/api/swagger
 
 ### Run with Docker (production-like)
 
@@ -70,7 +70,7 @@ DATABASE_SSL=false
 docker compose up --build -d
 ```
 
-Visit Swagger: http://localhost:3000/api/docs
+Visit Swagger: http://localhost:3000/api/swagger
 
 Stop:
 
