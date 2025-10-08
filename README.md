@@ -12,7 +12,7 @@ Microservices-based NestJS application with an API Gateway, Auth service, and Gi
 Runs everything with sensible defaults; no local env files required.
 
 ```bash
-docker compose -f docker-compose-test.yml up --build -d
+docker compose -f .\docker-compose-test.yml --env-file .env.docker.example up --build
 ```
 
 Services:
