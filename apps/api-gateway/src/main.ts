@@ -4,7 +4,10 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { RpcToHttpExceptionFilter } from './common/filters/rpc-exception.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { RepositoryDto } from './github/dto/repository.dto';
+import { SearchRepositoriesDto } from './github/dto/search-repositories.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule);
@@ -21,6 +24,7 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(new RpcToHttpExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   const config = new DocumentBuilder()
     .setTitle('GitHub Search App')
@@ -41,7 +45,9 @@ async function bootstrap() {
     )
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [RepositoryDto, SearchRepositoriesDto],
+  });
   SwaggerModule.setup('api/docs', app, document);
 
   const configService = app.get(ConfigService);
