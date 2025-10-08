@@ -48,7 +48,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config, {
     extraModels: [RepositoryDto, SearchRepositoriesDto],
   });
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/swagger', app, document);
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('API_GATEWAY_PORT') ?? 3000;
