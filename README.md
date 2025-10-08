@@ -87,6 +87,16 @@ npm run test      # unit tests
 npm run test:e2e  # e2e tests for all services
 ```
 
+### Documentation
+
+View code documentation generated with Compodoc:
+
+```bash
+npm run docs:generate  # generate static docs
+npm run docs:open      # open docs in browser
+npm run docs:serve     # serve with live reload (optional)
+```
+
 ### Project layout
 
 ```
