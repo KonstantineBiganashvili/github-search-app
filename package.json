@@ -20,7 +20,10 @@
     "test:e2e:api-gateway": "jest --runInBand --config ./apps/api-gateway/test/jest-e2e.json",
     "test:e2e:auth-api": "jest --runInBand --config ./apps/auth-api/test/jest-e2e.json",
     "test:e2e:github-api": "jest --runInBand --config ./apps/github-api/test/jest-e2e.json",
-    "test:e2e": "npm run test:e2e:api-gateway && npm run test:e2e:auth-api && npm run test:e2e:github-api"
+    "test:e2e": "npm run test:e2e:api-gateway && npm run test:e2e:auth-api && npm run test:e2e:github-api",
+    "docs:generate": "npx @compodoc/compodoc -p tsconfig.json",
+    "docs:serve": "npx @compodoc/compodoc -p tsconfig.json -s",
+    "docs:open": "start documentation/index.html"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
@@ -49,6 +52,7 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.31",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
